@@ -1,0 +1,10 @@
+[package]
+name = "marin"
+version = "0.1.0"
+authors = ["SitiSchu <admin@sitischu.com>"]
+edition = "2018"
+
+[dependencies]
+pest = "2.1"
+pest_derive = "2.1"
+derive_more = "0.99"

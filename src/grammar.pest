@@ -1,0 +1,30 @@
+Marin = { SOI ~ (Keyword | Flag | Value)* }
+
+Keyword = ${ String ~ ":" ~ Value }
+
+List = { "[" ~ Value ~ ("," ~ Value)* ~ "]" | "[" ~ "]" }
+
+Value = { RangeExpr | Float | Int | List | Bool | String }
+
+Flag = { "-" ~ FlagInner }
+FlagInner = @{ ASCII_ALPHA ~ Bareword? }
+
+RangeExpr = { RangeTo | Range }
+Range = { Int ~ ".." ~ Int }
+RangeTo = { ".." ~ Int }
+
+String = { "\"" ~ Inner ~ "\"" | Bareword }
+Bareword = @{ ASCII_ALPHANUMERIC+ }
+
+Inner = @{ (!("\"" | "\\") ~ ANY)* ~ (Escape ~ Inner)? }
+Escape = @{ "\\" ~ ("\"" | "\\") }
+
+Float = @{ Int ~ ("." ~ ASCII_DIGIT+ ~ Exp? | Exp) }
+Int = @{ "-"? ~ ("0" | ASCII_NONZERO_DIGIT ~ ASCII_DIGIT*) }
+Exp = @{ ("E" | "e") ~ ("+" | "-")? ~ ASCII_DIGIT+ }
+
+Bool = { "true" | "false" | "True" | "False" }
+
+COMMENT = _{ "#" ~ ANY* }
+WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
+
