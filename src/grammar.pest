@@ -1,6 +1,6 @@
-Marin = { SOI ~ (Keyword | Flag | Value)* }
+Marin = { SOI ~ (Keyword | Flag | Value)* ~ EOI }
 
-Keyword = ${ String ~ ":" ~ Value }
+Keyword = { String ~ ":" ~ Value }
 
 List = { "[" ~ Value ~ ("," ~ Value)* ~ "]" | "[" ~ "]" }
 
@@ -10,21 +10,23 @@ Flag = { "-" ~ FlagInner }
 FlagInner = @{ ASCII_ALPHA ~ Bareword? }
 
 RangeExpr = { RangeTo | Range }
-Range = { Int ~ ".." ~ Int }
-RangeTo = { ".." ~ Int }
+Range = { Number ~ ".." ~ Number }
+RangeTo = { ".." ~ Number }
 
 String = { "\"" ~ Inner ~ "\"" | Bareword }
-Bareword = @{ ASCII_ALPHANUMERIC+ }
+Bareword = @{ (ASCII_ALPHANUMERIC | "@" | "." | ":/" | "/")+ }
 
 Inner = @{ (!("\"" | "\\") ~ ANY)* ~ (Escape ~ Inner)? }
 Escape = @{ "\\" ~ ("\"" | "\\") }
 
-Float = @{ Int ~ ("." ~ ASCII_DIGIT+ ~ Exp? | Exp) }
-Int = @{ "-"? ~ ("0" | ASCII_NONZERO_DIGIT ~ ASCII_DIGIT*) }
-Exp = @{ ("E" | "e") ~ ("+" | "-")? ~ ASCII_DIGIT+ }
+Exp = @{ ^"e" ~ ("+" | "-")? ~ ASCII_DIGIT+ }
+Number = @{ "-"? ~ ("0" | ASCII_NONZERO_DIGIT ~ ASCII_DIGIT*) }
+
+Float = @{ Number ~ ("." ~ ASCII_DIGIT+ ~ Exp? | Exp) }
+Int = @{ Number ~ !Bareword}
 
 Bool = { "true" | "false" | "True" | "False" }
 
 COMMENT = _{ "#" ~ ANY* }
-WHITESPACE = _{ " " | "\t" | "\r" | "\n" }
+WHITESPACE = _{ " " | "\t" | NEWLINE }
 
