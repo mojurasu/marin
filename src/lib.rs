@@ -7,33 +7,18 @@ use std::collections::HashMap;
 use std::fmt;
 use std::ops::Range;
 
-use derive_more::From;
 use pest::iterators::Pair;
 use pest::Parser;
 
 use error::Result;
+use marin_value::MarinValue;
 use parser::*;
 
 mod error;
 
 mod parser;
 
-#[derive(Debug, PartialEq, From)]
-pub enum MarinValue {
-    String(String),
-    Bool(bool),
-    Int(i64),
-    Float(f64),
-    List(Vec<MarinValue>),
-    Range(Range<i64>),
-}
-
-impl From<&str> for MarinValue {
-    fn from(s: &str) -> Self {
-        MarinValue::String(s.into())
-    }
-}
-
+mod marin_value;
 
 #[derive(Debug, PartialEq)]
 pub struct Marin<'a> {
@@ -66,7 +51,8 @@ impl Marin<'_> {
                         let key = inner.as_str();
                         kwargs.insert(key, MarinValue::Bool(true));
                     }
-                    Rule::Value => args.push(Self::serialize(&pair)?),
+                    Rule::Value | Rule::Number => args.push(Self::serialize(&pair)?),
+                    Rule::EOI => (),
                     _ => unreachable!()
                 }
             };
@@ -104,7 +90,7 @@ impl Marin<'_> {
                 }
             }
             Rule::Float => MarinValue::Float(pair.as_str().parse().unwrap()),
-            Rule::Int => MarinValue::Int(pair.as_str().parse().unwrap()),
+            Rule::Int | Rule::Number => MarinValue::Int(pair.as_str().parse().unwrap()),
             Rule::Bool => MarinValue::Bool(pair.as_str().to_lowercase().parse().unwrap()),
             Rule::String => {
                 let inner = pair.clone().into_inner().next().unwrap();
@@ -113,6 +99,12 @@ impl Marin<'_> {
                     Rule::Bareword => MarinValue::String(inner.as_str().into()),
                     _ => unreachable!(),
                 }
+            }
+            Rule::List => {
+                let list: Vec<MarinValue> =  pair.clone().into_inner()
+                    .map(|v| Self::serialize(&v))
+                    .collect::<Result<Vec<MarinValue>>>()?;
+                MarinValue::List(list)
             }
             _ => unreachable!()
         };

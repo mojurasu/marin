@@ -69,6 +69,7 @@ mod tests {
                     Value(7, 11, [
                         Float(7, 11, []),
                     ]),
+                    EOI(11, 11, []),
                 ]),
             ]
         };
@@ -78,10 +79,10 @@ mod tests {
     fn positional_strings() {
         parses_to! {
             parser: MarinParser,
-            input:  "arg1 arg2 arg3",
+            input:  "arg1 arg2 arg3 4arg",
             rule:   Rule::Marin,
             tokens: [
-                Marin(0, 14, [
+                Marin(0, 19, [
                     Value(0, 4, [
                         String(0, 4, [
                             Bareword(0, 4, []),
@@ -97,6 +98,12 @@ mod tests {
                             Bareword(10, 14, []),
                         ]),
                     ]),
+                    Value(15, 19, [
+                        String(15, 19, [
+                            Bareword(15, 19, []),
+                        ]),
+                    ]),
+                    EOI(19, 19, []),
                 ]),
             ]
         };
@@ -126,6 +133,7 @@ mod tests {
                             Bool(14, 18, []),
                         ]),
                     ]),
+                    EOI(18, 18, []),
                 ]),
             ]
         };
@@ -145,6 +153,7 @@ mod tests {
                     Flag(7, 13, [
                         FlagInner(8, 13, []),
                     ]),
+                    EOI(13, 13, []),
                 ]),
             ]
         };
@@ -168,6 +177,7 @@ mod tests {
                             ]),
                         ]),
                     ]),
+                    EOI(24, 24, []),
                 ]),
             ]
         };
@@ -212,6 +222,7 @@ mod tests {
                             ]),
                         ]),
                     ]),
+                    EOI(23, 23, []),
                 ]),
 
             ]
@@ -234,8 +245,8 @@ mod tests {
                         Value(7, 12, [
                             RangeExpr(7, 12, [
                                 Range(7, 12, [
-                                    Int(7, 8, []),
-                                    Int(10, 12, []),
+                                    Number(7, 8, []),
+                                    Number(10, 12, []),
                                 ]),
                             ]),
                         ]),
@@ -243,18 +254,19 @@ mod tests {
                     Value(13, 19, [
                         RangeExpr(13, 19, [
                             Range(13, 19, [
-                                Int(13, 15, []),
-                                Int(17, 19, []),
+                                Number(13, 15, []),
+                                Number(17, 19, []),
                             ]),
                         ]),
                     ]),
                     Value(20, 24, [
                         RangeExpr(20, 24, [
                             RangeTo(20, 24, [
-                                Int(22, 24, []),
+                                Number(22, 24, []),
                             ]),
                         ]),
                     ]),
+                    EOI(24, 24, []),
                 ]),
             ]
         };
