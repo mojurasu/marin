@@ -4,6 +4,9 @@ version = "0.1.0"
 authors = ["SitiSchu <admin@sitischu.com>"]
 edition = "2018"
 
+[dev-dependencies]
+linefeed = "0.6"
+
 [dependencies]
 pest = "2.1"
 pest_derive = "2.1"
