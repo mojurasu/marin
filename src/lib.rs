@@ -146,7 +146,7 @@ mod tests {
     #[test]
     fn flags() -> Result<()> {
         let m = Marin::parse("-overwrite -dynamic")?;
-                let mut kwargs: HashMap<&str, MarinValue> = HashMap::new();
+        let mut kwargs: HashMap<&str, MarinValue> = HashMap::new();
         kwargs.insert("overwrite", true.into());
         kwargs.insert("dynamic", true.into());
         assert_eq!(m, Marin { args: vec![], kwargs });
@@ -156,7 +156,7 @@ mod tests {
     #[test]
     fn flags_and_keywords() -> Result<()> {
         let m = Marin::parse("-overwrite offset: 30m")?;
-                let mut kwargs: HashMap<&str, MarinValue> = HashMap::new();
+        let mut kwargs: HashMap<&str, MarinValue> = HashMap::new();
         kwargs.insert("overwrite", true.into());
         kwargs.insert("offset", "30m".into());
         assert_eq!(m, Marin { args: vec![], kwargs });
@@ -166,51 +166,68 @@ mod tests {
     #[test]
     fn positional_int_and_flags() -> Result<()> {
         let m = Marin::parse("777000 -mention -id")?;
-        assert_eq!(m, Marin { args: vec![], kwargs: HashMap::new() });
+        let kwargs: HashMap<&str, MarinValue> = vec![
+            ("mention", true.into()),
+            ("id", true.into()),
+        ].into_iter().collect();
+        assert_eq!(m, Marin { args: vec![777000.into()], kwargs });
         Ok(())
     }
 
     #[test]
     fn positional_username() -> Result<()> {
         let m = Marin::parse("@username")?;
-        assert_eq!(m, Marin { args: vec![], kwargs: HashMap::new() });
+        assert_eq!(m, Marin { args: vec!["@username".into()], kwargs: HashMap::new() });
         Ok(())
     }
 
     #[test]
     fn invite_link() -> Result<()> {
         let m = Marin::parse("https://t.me/joinchat/CkzknkNYuLsKbTc91GfhGw")?;
-        assert_eq!(m, Marin { args: vec![], kwargs: HashMap::new() });
+        assert_eq!(m, Marin { args: vec!["https://t.me/joinchat/CkzknkNYuLsKbTc91GfhGw".into()], kwargs: HashMap::new() });
         Ok(())
     }
 
     #[test]
     fn quoted_key_word_argument() -> Result<()> {
         let m = Marin::parse("reason: \"spam[gban]\"")?;
-        assert_eq!(m, Marin { args: vec![], kwargs: HashMap::new() });
+        let kwargs: HashMap<&str, MarinValue> = vec![
+            ("reason", "spam[gban]".into()),
+        ].into_iter().collect();
+        assert_eq!(m, Marin { args: vec![], kwargs });
         Ok(())
     }
 
     #[test]
     fn wildcard_keyword_argument() -> Result<()> {
         let m = Marin::parse("reason: \"Kriminalamt *\"")?;
-        assert_eq!(m, Marin { args: vec![], kwargs: HashMap::new() });
+        let kwargs: HashMap<&str, MarinValue> = vec![
+            ("reason", "Kriminalamt *".into()),
+        ].into_iter().collect();
+        assert_eq!(m, Marin { args: vec![], kwargs });
         Ok(())
     }
 
     #[test]
     fn keyword_with_link() -> Result<()> {
         let m = Marin::parse("777000 \"ban reason\" link: https://t.me/c/1129887931/26708")?;
-        assert_eq!(m, Marin { args: vec![], kwargs: HashMap::new() });
+        let kwargs: HashMap<&str, MarinValue> = vec![
+            ("link", "https://t.me/c/1129887931/26708".into()),
+        ].into_iter().collect();
+        assert_eq!(m, Marin {
+            args: vec![777000.into(), "ban reason".into()],
+            kwargs,
+        });
         Ok(())
     }
 
     #[test]
     fn chat_id_with_flags() -> Result<()> {
         let m = Marin::parse("-1001129887931 -strafanzeige polizei: exclude")?;
-        let mut kwargs: HashMap<&str, MarinValue> = HashMap::new();
-        kwargs.insert("polizei", "exclude".into());
-        kwargs.insert("strafanzeige", true.into());
+        let kwargs: HashMap<&str, MarinValue> = vec![
+            ("strafanzeige", true.into()),
+            ("polizei", "exclude".into()),
+        ].into_iter().collect();
         assert_eq!(m, Marin {
             args: vec![Int(-1001129887931)],
             kwargs,
@@ -221,50 +238,84 @@ mod tests {
     #[test]
     fn list_of_ids() -> Result<()> {
         let m = Marin::parse("chats: [-1001129887931, -1001367463001]")?;
-        assert_eq!(m, Marin { args: vec![], kwargs: HashMap::new() });
+        let kwargs: HashMap<&str, MarinValue> = vec![
+            ("chats", vec![Int(-1001129887931), Int(-1001367463001)].into()),
+        ].into_iter().collect();
+        assert_eq!(m, Marin { args: vec![], kwargs });
         Ok(())
     }
 
     #[test]
     fn positonal_arguments() -> Result<()> {
-        let m = Marin::parse("arg1 arg2 arg3")?;
-        assert_eq!(m, Marin { args: vec![], kwargs: HashMap::new() });
+        let m = Marin::parse("arg1 arg2 arg3 4arg")?;
+        assert_eq!(m, Marin {
+            args: vec![
+                "arg1".into(),
+                "arg2".into(),
+                "arg3".into(),
+                "4arg".into(),
+            ].into(),
+            kwargs: HashMap::new(),
+        });
         Ok(())
     }
 
     #[test]
     fn keyword_arguments() -> Result<()> {
         let m = Marin::parse("arg1: val1 arg2: \"val2.1 val2.2\"")?;
-        assert_eq!(m, Marin { args: vec![], kwargs: HashMap::new() });
+        let kwargs: HashMap<&str, MarinValue> = vec![
+            ("arg1", "val1".into()),
+            ("arg2", "val2.1 val2.2".into()),
+        ].into_iter().collect();
+        assert_eq!(m, Marin { args: vec![], kwargs });
         Ok(())
     }
 
     #[test]
     fn keyword_with_lists() -> Result<()> {
         let m = Marin::parse("arg: [123, 456] arg2: [\"abc\", \"de f\", \"xyz\"]")?;
-        assert_eq!(m, Marin { args: vec![], kwargs: HashMap::new() });
+        let kwargs: HashMap<&str, MarinValue> = vec![
+            ("arg", vec![123.into(), 456.into()].into()),
+            ("arg2", vec!["abc".into(), "de f".into(), "xyz".into()].into()),
+        ].into_iter().collect();
+        assert_eq!(m, Marin { args: vec![], kwargs });
         Ok(())
     }
 
     #[test]
     fn keyword_with_ranges() -> Result<()> {
-        let m = Marin::parse("arg: 1..10 arg2: -5..5 arg2: -10..0")?;
-        assert_eq!(m, Marin { args: vec![], kwargs: HashMap::new() });
+        let m = Marin::parse("arg: 1..10 arg2: -5..5 arg3: -10..0")?;
+        let kwargs: HashMap<&str, MarinValue> = vec![
+            ("arg", Range(1..10)),
+            ("arg2", Range(-5..5)),
+            ("arg3", Range(-10..0)),
+        ].into_iter().collect();
+        assert_eq!(m, Marin { args: vec![], kwargs });
         Ok(())
     }
 
     #[test]
     fn scientific_notation() -> Result<()> {
         let m = Marin::parse("1e4 2.5e4 125e-5")?;
-        assert_eq!(m, Marin { args: vec![], kwargs: HashMap::new() });
+        assert_eq!(m, Marin { args: vec![Float(10000.0), Float(25000.0), Float(0.00125)], kwargs: HashMap::new() });
         Ok(())
     }
 
     #[test]
     fn duration_expression() -> Result<()> {
         let m = Marin::parse("2w3d3h5s")?;
-        assert_eq!(m, Marin { args: vec![], kwargs: HashMap::new() });
+        assert_eq!(m, Marin {
+            args: vec!["2w3d3h5s".into()],
+            kwargs: HashMap::new(),
+        });
         Ok(())
+    }
+
+    #[test]
+    #[should_panic]
+    fn flag_keyword() {
+        let m = Marin::parse("-flag: 123").unwrap();
+        ()
     }
 }
 
