@@ -1,9 +1,13 @@
+mod format_test;
+
 use std::io;
 use std::sync::Arc;
 
 use linefeed::{Interface, ReadResult};
 
 use marin::Marin;
+use pest::error::{Error, ErrorVariant, InputLocation};
+use std::collections::HashMap;
 
 fn main() -> io::Result<()> {
     let interface = Arc::new(Interface::new(env!("CARGO_PKG_NAME"))?);
@@ -46,9 +50,13 @@ fn main() -> io::Result<()> {
             "q" | "exit" => break,
             _ => {
                 if !line.trim().is_empty() {
-                    let result = Marin::parse(&line).unwrap();
-                    println!("{:#?}", result);
-                    println!()
+                    match Marin::parse(&line) {
+                        Ok(r) => {
+                            println!("{:#?}", r);
+                            println!()
+                        }
+                        Err(e) => pretty_print_error(e),
+                    }
                 }
             }
         }

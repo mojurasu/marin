@@ -5,11 +5,13 @@ extern crate pest_derive;
 
 use std::collections::HashMap;
 use std::fmt;
+use std::fmt::{Display, Formatter};
 use std::ops::Range;
 
 use pest::iterators::Pair;
 use pest::Parser;
 
+pub use error::Error;
 use error::Result;
 use marin_value::MarinValue;
 use parser::*;
@@ -101,14 +103,29 @@ impl Marin<'_> {
                 }
             }
             Rule::List => {
-                let list: Vec<MarinValue> =  pair.clone().into_inner()
-                    .map(|v| Self::serialize(&v))
-                    .collect::<Result<Vec<MarinValue>>>()?;
+                let list: Vec<MarinValue> = pair.clone().into_inner()
+                                                .map(|v| Self::serialize(&v))
+                                                .collect::<Result<Vec<MarinValue>>>()?;
                 MarinValue::List(list)
             }
             _ => unreachable!()
         };
         Ok(val)
+    }
+}
+
+impl Display for Marin<'_> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        writeln!(f, "Arguments:")?;
+        for arg in &self.args {
+            writeln!(f, "    {:?}", arg)?;
+        }
+        writeln!(f, "Keyword Arguments:")?;
+
+        for (key, value) in self.kwargs.iter() {
+            writeln!(f, "    {}: {:?}", key, value)?;
+        }
+        Ok(())
     }
 }
 
