@@ -27,6 +27,6 @@ Int = @{ Number ~ !Bareword}
 
 Bool = { "true" | "false" | "True" | "False" }
 
-COMMENT = _{ "#" ~ ANY* }
+COMMENT = _{ "#" ~ (!NEWLINE ~ ANY)* }
 WHITESPACE = _{ " " | "\t" | NEWLINE }
 
