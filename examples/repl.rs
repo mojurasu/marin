@@ -14,7 +14,7 @@ fn main() -> io::Result<()> {
 
     println!("Enter \"help\" for examples.");
     println!("Press Ctrl-D or enter \"exit\" to exit.");
-    println!("(Parsing errors are not handled right now, nor is output formatted nicely)");
+    println!("(Parsing errors are not formatted nicely right now)");
     println!();
 
     interface.set_prompt("marin> ")?;
@@ -52,10 +52,10 @@ fn main() -> io::Result<()> {
                 if !line.trim().is_empty() {
                     match Marin::parse(&line) {
                         Ok(r) => {
-                            println!("{:#?}", r);
+                            println!("{}", r);
                             println!()
                         }
-                        Err(e) => pretty_print_error(e),
+                        Err(e) => println!("{}", e),
                     }
                 }
             }
