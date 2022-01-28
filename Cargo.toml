@@ -3,6 +3,12 @@ name = "marin"
 version = "0.1.0"
 authors = ["SitiSchu <admin@sitischu.com>"]
 edition = "2018"
+description = "Rust implementation of the DSL used for kantek (kv2.dev)"
+readme = "README.md"
+repository = "https://github.com/mojurasu/marin"
+license = "GPL-3.0-only"
+keywords = ["dsl", "config", "parser"]
+categories = ["command-line-utilities", "parser-implementations"]
 
 [dev-dependencies]
 linefeed = "0.6"
